@@ -1,2 +1,2 @@
 # My_Big_Brain
-readme
+Python codes. HWs.

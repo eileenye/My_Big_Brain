@@ -1,2 +1,2 @@
 # My_Big_Brain
-Python codes. HWs.
+Python codes. Projects.

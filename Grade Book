@@ -1,0 +1,85 @@
+#The following program functions as a grade book entry program. The program will
+        #list 5 options for the user to pick. This is defined in the print_menu function.
+        #The user will continue to input and pick options until they pick '5', which allows
+        #them to exit the program.
+def print_menu(): 
+        print('1. Add/modify student grade')
+        print('2. Delete student grade')
+        print('3. Print student grades')
+        print('4. Display the course statistics')
+        print('5. Quit')
+
+choice = '' #empty string is defined to store the choice of the user's
+grades = {} #empty dictionary is defined to store the student's name and points
+
+def addmodify():
+    '''This defines the 1st option in print_menu. It will asks the user to enter
+    the student's name and points and they will be entered in the grade system.'''    
+    name_points = input("Enter name and points (Ex. 'Bob 95'): ")
+    nameGrade_list = name_points.split() #split the name and points into 2 strings
+    name = nameGrade_list[0] #the first string will be the name
+    points = nameGrade_list[1] #the second string will the points
+    grades[name] = points #store names as key and points as values in the empty dictionary 'grades'
+
+def mean():
+        '''This defines part of the 4th option in print_menu. This displays the
+        mean of all the points in grade.'''
+        total = 0 #the sum of all the points starts at nothing
+        for key in grades: #for each key (name) in grades
+                values = int(grades[key]) #convert the points to integers
+                total += values #going through the entire grade dictionary
+        avg = total/len(grades) #calculate the average of the points and set it by 2
+        return '%.2f' % avg
+
+def median():
+        '''This defines part of the 4th option in print_menu. This displays the median
+        of all the points in grade.'''
+        valueSort = sorted(int(grades[key]) for key in grades) #sort the points in grade
+        midPos = len(grades)//2 #find the middle position in grades. If there's 2, get the 2nd middle number
+        return valueSort[midPos] #returns the point that's in the middle
+
+def mode():
+        '''This defines part of the 4th option in print_menu. This displays the mode
+        of all the points in grade'''
+        valueSort = sorted(int(grades[key]) for key in grades) #sort the points in grade
+        m = max([valueSort.count(a) for a in valueSort]) #find the number of maximum count of points
+        return [x for x in valueSort if valueSort.count(x) == m][0] if m>1 else None #
+        #return the point with the most count if the count number is more than 1 
+        
+def gradelist():
+        '''This defines the 3rd option in print_menu. It will display the student's
+        name and points in alphabetical order by name.'''
+        print ('-----Displaying Grades-----')
+        for key in sorted(grades): #if key (name) is in sorted grades (alphabetical order), it'll print name and points in key:value format
+                print ("%s : %s" % (key, grades[key]))
+        print('-----Done Displaying Grades-----')
+
+while choice != 5: #while it will stop the loop when it reaches 5 
+    print_menu() #the options from print_menu will always be printed before the user chooses an option
+    choice = input('Your choice: ') 
+    if choice == '1': #if user chooses 1, it will run and test the function from addmodify
+        addmodify()       
+    elif choice == '2': #if user chooses 2, it will ask the user who they want to delete. and deletes the name and points from grades
+        name = input('Enter a name to be removed (Ex. Bob): ')
+        if name in grades:
+            del grades[name]
+        else:
+            name = input('Enter a name to be removed (Ex. Bob): ') #if it's not stored in grades, it will ask the user again.
+    elif choice == '3': #if user choose 3, it will run and test the funciton from gradelist
+        gradelist()
+    elif choice == '4': #if user choose 4, it will display the mean, median, and mode which are defined above
+        print('-----Displaying Statistics-----')
+        print('Mean : ', mean())
+        print('Median : ', median())
+        print('Mode : ', mode())
+        print('-----Done Displaying Statistics-----')
+    elif choice.isdigit() == False or int(choice) > 5 or int(choice) < 1:
+        print('Unrecognized command.') #if the user inputs something that's not 1-5, it will print unrecognized command
+    else:
+        break #anything else (5) it will break and leaave the loop. stopping the program
+
+        
+
+        
+
+

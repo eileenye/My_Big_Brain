@@ -1,0 +1,225 @@
+#The following program funs a pokemon game. It implements a turn based battle system for 2 players.
+#the 2 players will input the name of their monsters and a menu will print out and they will choose
+#which attack they want to implement. The program will randomly choose which player will go first.
+#Both player will start with 100 points. The game will end when one of them reaches to 0 points.
+import random #import random module 
+
+def isInt(seed_value):
+    '''isInt checks if the input is a number or not.
+    It also checks if it's a negative number. This is used to check
+    whether the seed value entered is an input or not.'''
+    seed_value = seed_value.strip() #removes whitespace
+    if seed_value.isdigit(): #only numbers
+        return True
+    elif seed_value[1:].isdigit() and seed_value[0] == '-': #negative numbers
+        return True
+    else:
+        return False
+
+def choose_attack():
+    '''This defined function prints out the menu/choice of the attacks'''
+    print('1. Tackle')
+    print('2. High Jump Kick')
+    print('3. Desperate Blow')
+    print('4. Slack Off')   
+
+def strength(acc, min_stren, max_stren, crit_chance):
+    '''This defined function takes in 4 arguments. It reads the accuracy and minimum and maximum strength 
+    of the attack. And it will determine if there's a critical hit or not. The functions from the random module
+    were used to randomize the strength of the attacks.'''
+    damage = 0   #damage will start at 0, since the attack hasn't taken place yet
+    #determine if hit happened:
+    if random.random() < acc: #if within accuracy, we have a hit
+        damage = random.randint(min_stren, max_stren) #the damage will be within the min and max strength range
+        
+        if random.random() < crit_chance: #if within critical chance, it happend
+            damage *= 2 #if within critical chance, the damage will multiply
+    return damage #returns the damage in this function
+
+def isgameover(hp1, hp2, player1, player2):
+    '''This defined function determines which player won the game, and when some wins the game, the game ends.'''
+    if hp1 <= 0: #if the first player's hit points reaches 0,
+        print(player2, 'won the fight.') #player 2 has won the game
+        exit(0) #game ends
+    elif hp2 <= 0: #if the second player's hit points reaches 0,
+        print(player1, 'won the fight.') #player 1 wins the game
+        exit(0) #game ends
+
+def get_move(player):
+    '''This defined function gets the move from the player when it's their turn'''
+    choose = input('Enter your move: ') #player will enter their move
+    return choose
+
+    
+def total_points(hp1, hp2, player1, player2):
+    '''This defined funciton prints the players' remaining points'''
+    print(player1, 'has', hp1, 'hit points remaining.')
+    print(player2, 'has', hp2, 'hit points remaining.')
+
+def invalid_input(attacker):
+    '''This defined function prints which player gets to attack and prints the choices for the attacker to choose'''
+    print('Choose a move for', attacker, end = '')
+    print('.')
+    choose_attack()#display the board
+    
+             
+def main():
+    '''The main function runs the entire Pokemon game. It starts the players with 100 points and randomly
+    chooses which player gets to go first. The game continues and the points of each player will update until
+    one player reaches 0 points. And the game will end'''
+    #get the name and game set up
+    mon1 = 100 #player1 starts with 100 points
+    mon2 = 100 #player2 starts with 100 points
+    monsters = [] #before the game starts, there will be no players
+    monster1 = input('Enter the name for your monster: ') #asks player 1 to enter his/her monster's name
+    monster2 = input('Enter the name for your monster: ') #asks player 2 to enter his/her monster's name
+    monsters.append(monster1) #add the players in 'monsters'
+    monsters.append(monster2)
+    
+    seed = input('Enter a seed value: ') #asks for a seed value, so the answers will match Butner's
+
+    #check if the seed value entered is valid
+    while isInt(seed) == False: #if the seed value entered is not an integer, then it will keep asking
+        seed = input('Enter a seed value: ')
+    random.seed(int(seed)) #if it's a valid seed, it's converted to an integer so it can be used to set the position of where it should start randomizing
+
+    #this randomly picks which player goes first. 0 for player1 and 1 for player2
+    turn = random.randint(0,1)
+    
+    #after the game is set up, we play the game until it's gameover:
+    while not isgameover(mon1, mon2, monsters[0], monsters[1]): #while the game is still going on
+        total_points(mon1, mon2, monsters[0], monsters[1]) #we will print the total points of each player
+        print('Choose a move for', monsters[turn], end = '') #the program first randomly picks a player, and that player gets to go, after that, it just alternates
+        print('.')
+        menu = choose_attack() #display the choices
+        move = get_move(monsters[turn]) #the move will be what the player chooses
+
+        while move not in '1234': #the moves must be 1,2,3,or4. if not,
+            print('Choose a move for %s.' %(monsters[turn])) #the program will continue asking until they have entered a valid move
+            choose_attack()
+            move = get_move(monsters[turn])
+        
+        #updating the state
+        if move == '1': #if they choose 1 as their move (Tackle)
+            damage = strength(.90, 10, 20, 0.05) #the damage will have a 90% accuracy, min 10 pts and max 20 pts strength, critical chance of 5%
+            if monsters[turn] == monsters[0]: #if the first player attacks first
+                if damage == 0: #if the there are no damage, then that means 2nd player dodged the attack
+                    print(monsters[1], 'dodged the attack.')
+                elif damage > 20: #if the damage is over 20 pts, that means there was a critical hit
+                    if mon2 < damage: #if there the total points of player 2 is less than damage, then the damage will equal player 2's points
+                        damage = mon2 #so player 2's points wont' go under 0
+                    print(monsters[0], 'hit', monsters[1], 'with a Tackle dealing', damage, 'points of damage.')
+                    print('Critical Hit!')
+                else: 
+                    if mon2 < damage: #if the damage is over 20 pts, that means there was a critical hit
+                        damage = mon2 #if there the total points of player 2 is less than damage, then the damage will equal player 2's points
+                    print(monsters[0], 'hit', monsters[1], 'with a Tackle dealing', damage, 'points of damage.')                  
+                mon2-=damage #total points of player 2's will update
+            elif monsters[turn] == monsters[1]: #if it's player 2's turn to attack
+                if damage == 0: #if there's no damage, player 1 has dodged the attack
+                    print(monsters[0], 'dodged the attack.')
+                elif damage > 20: #if there over 20 points of damage, there's critical hit
+                    if mon1 < damage: #if damage is more than total points, set damage to points so total points won't go uner 0
+                        damage = mon1
+                    print(monsters[1], 'hit', monsters[0], 'with a Tackle dealing', damage, 'points of damage.')
+                    print('Critical Hit!')
+                else:
+                    if mon1 < damage: #if damage is more than total points, set damage to points so total points won't go uner 0
+                        damage = mon1
+                    print(monsters[1], 'hit', monsters[0], 'with a Tackle dealing', damage, 'points of damage.') 
+                mon1-=damage #update monster's points
+        elif move == '2': #if player's chooses move 2 (high jump kick)
+            damage = strength(.75, 25, 30, 0.05) #the damage will have a 75% accuracy, min 25 pts and max 30 pts strength, critical chance of 5%
+            if monsters[turn] == monsters[0]: #If it's player 1's turn to attack
+                if damage == 0: #if there's no damage, then player 2 dodged the attack
+                    print(monsters[1], 'dodged the attack.')
+                elif damage > 49: #if the damage is over 49, there's a critical hit
+                    if mon2 < damage: #if damage is more than total points, set damage to points so total points won't go uner 0
+                        damage = mon2
+                    print(monsters[0], 'hit', monsters[1], 'with a High Jump Kick dealing', damage, 'points of damage.')
+                    print('Critical Hit!')
+                else:
+                    if mon2 < damage:#if damage is more than total points, set damage to points so total points won't go uner 0
+                        damage = mon2
+                    print(monsters[0], 'hit', monsters[1], 'with a High Jump Kick dealing', damage, 'points of damage.')
+                mon2-=damage #update the player's points
+            elif monsters[turn] == monsters[1]: #if it's player 2's turn to atttack
+                if damage == 0: #if there's no damage then player 1 dodge the attack
+                    print(monsters[0], 'dodged the attack.')
+                elif damage > 49: #if the damage is over 49 points, then there's a critical hit
+                    if mon1 < damage:#if damage is more than total points, set damage to points so total points won't go uner 0
+                        damage = mon1
+                    print(monsters[1], 'hit', monsters[0], 'with a High Jump Kick dealing', damage, 'points of damage.')
+                    print('Critical Hit!')
+                else:
+                    if mon1 < damage:#if damage is more than total points, set damage to points so total points won't go uner 0
+                        damage = mon1
+                    print(monsters[1], 'hit', monsters[0], 'with a High Jump Kick dealing', damage, 'points of damage.') 
+                mon1-=damage #update the player's points
+        elif move == '3': #if player chooses move 3 (Desperate Blow)
+            damage = strength(.10, 50, 60, 0.05) #the damage will have a 10% accuracy, min 50 pts and max 60 pts strength, critical chance of 5%
+            if monsters[turn] == monsters[0]: #if it's player 1's turn to attack
+                if damage == 0: #if there are no damage, then player 2 dodged the attack
+                    print(monsters[1], 'dodged the attack.')
+                elif damage > 99: #if damage is over 99, then there's a critical hit
+                    if mon2 < damage:#if damage is more than total points, set damage to points so total points won't go uner 0
+                        damage = mon2
+                    print(monsters[0], 'hit', monsters[1], 'with a Desperate Blow dealing', damage, 'points of damage.')
+                    print('Critical Hit!')
+                else:
+                    if mon2 < damage:#if damage is more than total points, set damage to points so total points won't go uner 0
+                        damage = mon2
+                    print(monsters[0], 'hit', monsters[1], 'with a Desperate Blow dealing', damage, 'points of damage.')
+                mon2-=damage #update the player's points
+            elif monsters[turn] == monsters[1]: #if it's player 2's turn to attack
+                if damage == 0: #if there's no damage, then player 1 dodged the attack
+                    print(monsters[0], 'dodged the attack.')
+                elif damage > 99: #if damage is over 99, then we have a critical hit
+                    if mon1 < damage:#if damage is more than total points, set damage to points so total points won't go uner 0
+                        damage = mon1
+                    print(monsters[1], 'hit', monsters[0], 'with a Desperate Blow dealing', damage, 'points of damage.')
+                    print('Critical Hit!')
+                else:
+                    if mon1 < damage:#if damage is more than total points, set damage to points so total points won't go uner 0
+                        damage = mon1
+                    print(monsters[1], 'hit', monsters[0], 'with a Desperate Blow dealing', damage, 'points of damage.')
+                mon1-=damage #update player's points
+        elif move == '4': #if player chooses move 4
+            heal = strength(.95, 15, 20, 0.05) #the heal will have a 95% accuracy, min 15 pts and max 20 pts strength, critical chance of 5%
+            if monsters[turn] == monsters[0]: #if it's player 1's turn to heal
+                if heal == 0 or mon1 == 100: #if there is no heal, or if player is already in full health, then no heal will be made
+                    print(monsters[0], 'failed to heal itself.')
+                elif heal > 29: #if heal points are over 29, then there's critical hit
+                    if heal > abs(100 - mon1): #if heal points are more than needed, then we set that to full amt points minus the total points
+                        heal = 100 - mon1
+                    print(monsters[0], 'Slacked Off, healing', heal, 'points of damage.')
+                    print('Critical Hit!')
+                    mon1+=heal #update the health of player
+                else:
+                    if heal > abs(100 - mon1): #if heal points are more than needed, then we set that to full amt points minus the total points
+                        heal = 100 - mon1
+                    print(monsters[0], 'Slacked Off, healing', heal, 'points of damage.')
+                    mon1+=heal #update the health of player
+            elif monsters[turn] == monsters[1]: #if it's player 2's turn to heal
+                if heal == 0 or mon2 == 100: #if there's no heal or if the player is in full health, then no heal are made
+                    print(monsters[1], 'failed to heal itself.')
+                elif heal > 29: #if the heal points are over 29, then we have critical hit
+                    if heal > abs(100 - mon2): #if heal points are more than needed, then we set that to full amt points minus the total points
+                        heal = 100 - mon2
+                    print(monsters[1], 'Slacked Off, healing', heal, 'points of damage.')
+                    print('Critical Hit!')
+                    mon2+=heal #update the health of player
+                else:
+                    if heal > abs(100 - mon2): #if heal points are more than needed, then we set that to full amt points minus the total points
+                        heal = 100 - mon2
+                    print(monsters[1], 'Slacked Off, healing', heal, 'points of damage.')
+                    mon2+=heal #update the health of player
+    
+        
+        if turn == 0: #if the randomized turn is player 1, then the next player will be player 2
+            turn = (turn + 1) % 2
+        elif turn == 1: #if the randomized turn in player 2, then the next player will be player 1
+            turn = (turn - 1) % 2
+
+
+main() #print the main function

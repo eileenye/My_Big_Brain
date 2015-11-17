@@ -1,0 +1,159 @@
+#The following program implements the HangMan game. There will be 2 players for this game.
+#The first player will input a string (secret word) for the second player to guess.
+#After the first player inputs a secret word, each character in the secret word will be
+#replaced with '?', and when the second player guesses a letter correct, the '?' will flip over
+#and reveal the letter in the '?' position for the word. Everytime the player guesses incorrectly,
+#a bodypart of the hangman is revealed. The second player will lose if the secret word is not guessed
+#and the entire man hung, is revealed.
+
+#This is the picture of the hangman for each letter guessed wrong. The body part will be shown in order
+#until all the body parts are shown, or when the secret word is guessed. The picture starts with the string that
+#hangs the person, then the head, body, arms and legs.
+HANGMANPICS = [''' ''', ''' 
+
+  
+  |  
+      
+      
+    
+      
+''', '''
+
+  
+  |   
+  0   
+      
+      
+      
+''', '''
+
+  
+  |   
+  0   
+  |   
+      
+      
+''', '''
+
+  
+  |   
+  0   
+ /|   
+      
+      
+''', '''
+
+  
+  |   
+  0   
+ /|\  
+      
+      
+''', '''
+
+  
+  |   
+  0   
+ /|\  
+ /    
+      
+''', '''
+
+  
+  |   
+  0   
+ /|\  
+ / \  
+      
+''']
+
+def getSecret_Word():
+    '''This defined function gets the secret word from the first player. It first asks the 1st player to enter
+    a word for 2nd player to guess. Then the program turns the secret word into a bunch of '?', where each '?'
+    represents a letter in the string.'''
+    while True:
+        secretWord =input('Please enter a word to be guessed\nthat does not contain ? or white space: ')
+        secretWord = secretWord.strip() #make sure the beginning and end of the string doesn't have spaces
+        if not(' ' in secretWord or '?' in secretWord or secretWord ==''): #makes sure that the word is valid
+          return secretWord #returns back to secretWord if invalid
+
+def displayBoard(HANGMANPICS, missedLetters, correctLetters, secretWord):
+    '''This defined function displays the who layout of the game. It takes in 4 arguments, and HANGMANPICS
+    is already defined above. There will be different rules for each of the 4 arguments.'''
+    print(HANGMANPICS[len(missedLetters)]) #prints a body part of the hangman for each time the 2nd player guesses the letter wrong
+    print() #prints an empty row
+    blanks = '?' * len(secretWord) #the letters not guessed will the '?' for the player to guess
+
+    for i in range(len(secretWord)): #this is the rule to guessing the word correctly
+        if secretWord[i] in correctLetters: #everytime the letters are guess correctly, the '?' will flip and reveal the letter beneath
+            blanks = blanks[:i] + secretWord[i] + blanks[i+1:] #so now the new blanks will include '?' and the guessed letters
+
+    for letter in blanks: #for letter in the secret word
+      print(letter,end="") #print the rule above. Revealing the correct guessed words
+    print() #prints an empty row
+    
+    
+    print('So far you have guessed:', ', '.join(sorted(missedLetters+correctLetters))) #the program will tell u what you have guessed so far
+    print()#prints an empty row
+
+
+
+def getGuess(alreadyGuessed):
+    '''This defined function gets the guess from the second player. It will tell them if they have entered
+    a valid/invalid guess.'''
+    while True:
+        print('Please enter your next guess: ',end='') #prompts them to enter a guess
+        guess = input() 
+        guess = guess.lower() #convert the guess to a lower case
+        if len(guess) > 1 and guess.isspace() == False: #if the guess is more than one letter
+            print('You can only guess a single character.') #it will tell them they can only enter a single character and prompts them to enter a guess again
+        elif len(guess) == 0 or guess.isspace() == True: #if they did not enter a guess/ enter spaces as guesses
+            print('You must enter a guess.') #it will tell them they have to guessa nd prompts them to enter a guess again
+        elif (guess.isspace() == False and guess in alreadyGuessed): #if they have already guessed that guess
+            print('\nYou already guessed the character:', guess) #it will tell them they have guess the character and prompts them to enter a guess again
+        else: #other guesses are valide guesses
+            return guess
+
+def main():
+    '''The main function will run the entire hangman program, allowing 2 players to play.
+    There will be a player that creates the secret word, and a player that guesses the secret
+    word.'''
+    #in the beginning of the game, player 2 hasn't made a guess yet, so empty strings are set for missed letters
+        #and correct letters, and the game isn't over yet. But we will get the secret word after the 1st player enter the secret wword
+    missedLetters = '' 
+    correctLetters = ''
+    secretWord = getSecret_Word()
+    gameOver = False
+
+    while not gameOver: #while the game's not over yet
+        displayBoard(HANGMANPICS, missedLetters, correctLetters, secretWord) #the board is displayed
+       
+        guess = getGuess(missedLetters + correctLetters) #player 2 will guess the letters, either valid/invalid guesses
+
+        if guess in secretWord: #if the player's guess is in the secret word
+            correctLetters = correctLetters + guess #the letter will be added to correctLetters
+
+            #check if the letters in the secret word are found
+            foundAllLetters = True #set foundAllLetters to True 
+            for i in range(len(secretWord)): 
+                if secretWord[i] not in correctLetters: #if the letter in the secret word are not all found
+                    foundAllLetters = False #then it will be set to False and breaks out of the loop and game ends
+                    break
+            if foundAllLetters: #if all the letters in the secret word is found, second player wins and game is over
+                print('You correctly guessed the secret word:', secretWord)
+                gameOver = True
+        else: #if the letters guessed are not correct, we add that to our list of missed letters
+            missedLetters = missedLetters + guess
+
+            
+            if len(missedLetters) == len(HANGMANPICS) - 1: #if we the length of missed letters matches the length of hang man guy
+                print(HANGMANPICS[len(missedLetters)]) #it will print the hangman picture
+                print('You failed to guess the secret word:', secretWord) #and player 2 loses the hangman game
+                gameOver = True #then the game is over
+
+        
+        if gameOver: #if the game is over, then the game ends
+                break
+
+
+main()

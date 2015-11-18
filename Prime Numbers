@@ -1,0 +1,21 @@
+#The following program asks the user to input a number that is greater than 2.
+   #Then the program will list all non-negative prime numbers under and equal to
+   #the number the user inputs.
+prime = input('Please enter an integer >= 2: ')
+
+def isInt(prime):
+   '''This defined function checks if the input from users are integers
+   While it's not a number or the number is under 2, the program will ask the users
+   to input a number above 2 again. If users input anything other than that, the input
+   will be converted to an integer'''
+   while prime.isdigit() == False or int(prime) < 2:
+      prime = input('Please enter an integer >= 2: ')
+   return int(prime)
+
+for num in range(2, isInt(prime) + 1): #for the number is between or equal to 2 to the number the user inputs
+         if num >= 2: #if the number is over or equal 2,
+             for i in range(2,num): #for each prime will be within 2 and the number user inputs
+                 if (num % i) == 0: #and if the number is not a prime, break
+                     break
+             else:
+                 print(num) #if the number is a prime, print the number

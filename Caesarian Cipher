@@ -1,0 +1,42 @@
+#The following program implements a Caesarian Cipher. It will take a string and shift amount
+    #shift number and shifts all the characters in the string by the number of positions.
+#Below, I have 2 definitions that defines what the shift amount should do and what
+    #the cipher of the strings should be.
+def shiftit(shift):
+    '''The should amount should be a number and must be between 0 and 25.
+    If it is neither of those, the program will @return the question and
+    ask the user to input a shift amount again. If the input is a number and
+    between 0 and 25, it will convert the number to an integer'''
+    while shift.isdigit() == False or int(shift) not in range(0, 26, 1): #while shift is not from 0 to 25 and a digit
+        shift = input('Please enter a shift amount between 0 and 25: ')
+    return int(shift)
+
+def cipherit(string, shift):
+    '''The program will only cipher alphabetical characters. If it is not an
+    alphabet, then the characters will stay as it is in the new string. In the
+    for loop below, an empty string is created so the new ciphered string can be
+    created.'''
+    cipher = ''
+    for index in range(len(string)): #in each position of the string
+        toInteger = ord(string[index]) #convert each character in the string to its decimal ASCII value
+        if ord('A') <=  toInteger <= ord('Z'): #if the convert string is between decimal ASCII value of A and Z
+            if toInteger + shift <= ord('Z'): 
+                cipher += chr(toInteger + shift) #move the ASCII value 1 over if the converted string + shift value is less than decimal ASCII value of 'Z'
+            else:
+                cipher += chr(toInteger + shift - ord('Z') + ord('A') - 1) #wrap back around to the 'ABC...' if ASCII value is more than 'Z'
+        elif ord('a') <= toInteger <= ord('z'):#if the convert string is between decimal ASCII value of a and z
+            if toInteger + shift <= ord('z'): #move the ASCII value 1 over if the converted string + shift value is less than decimal ASCII value of 'z'
+                cipher += chr(toInteger + shift)
+            else:
+                cipher += chr(toInteger + shift - ord('z') + ord('a') - 1) #wrap back around to the 'abc...' if ASCII value is more than 'z'
+        else:
+            cipher += chr(toInteger) #If it's not a alphabet, leave it alone
+    return cipher #return the new string
+
+#The program will start reading from here before running the definitions above
+string = input('Please enter a string to be ciphered: ') #asks user to input a string they want to be ciphered
+shift = input ('Please enter a shift amount between 0 and 25: ') #asks user to input a shift amount they want
+shift = shiftit(shift) #the returned int(shift) from shiftit function will be implemented in the shift user input
+print(cipherit(string, shift)) #prints the new ciphered string
+
+
